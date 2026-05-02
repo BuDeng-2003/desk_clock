@@ -27,7 +27,9 @@ SPI: `SPI(1)`, 40MHz. 设备: COM8.
 
 ```
 desk_clock/
+  config.example.py         ← 配置文件模板
   esp32_image/             ← 设备文件系统镜像
+    config.py              ← 真实配置（gitignore，不提交）
     main.py                ← 主程序
     common/net_weather.py  ← 网络模块
     fonts/                 ← 字体
@@ -51,7 +53,10 @@ desk_clock/
    ```
 
 3. **配置 WiFi 和 API**
-   编辑 `esp32_image/main.py` 修改 `WIFI_SSID`、`API_KEY`、`CITY`
+   ```
+   cp config.example.py esp32_image/config.py
+   ```
+   编辑 `esp32_image/config.py`，填入真实的 WiFi、心知天气 API Key、Portal 认证信息
 
 4. **推送全部文件到 ESP32**
    ```
@@ -67,8 +72,10 @@ desk_clock/
 
 | 标签 | 说明 |
 |------|------|
+| v7.0 | 敏感信息移入 config.py，gitignore 排除 |
+| v6.0 | 项目目录重组为标准结构，新增 README |
 | v5.0 | 天气布局重构，修复时间频闪 |
-| v4.0 | 精简 CLAUDE.md，公共规范抽到父目录 |
+| v4.0 | 精简 CLAUDE.md |
 | v3.0 | 卡片式时间显示 + 天气描述 |
 | v2.0 | ESP32 运行文件归入 esp32_image/ |
 | v1.0 | 项目初始化 |
