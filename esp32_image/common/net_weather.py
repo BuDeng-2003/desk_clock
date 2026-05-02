@@ -121,27 +121,33 @@ def fetch_weather(api_key, city="wuhan"):
         s.send(req.encode('utf-8'))
         
         buffer = b""
-        weather_code, temp = None, None
-        
+        weather_code, temp, text = None, None, None
+
         while True:
             chunk = s.recv(64)
             if not chunk: break
             buffer += chunk
-            
+
             if weather_code is None and b'"code":"' in buffer:
                 try: weather_code = buffer.split(b'"code":"')[1].split(b'"')[0]
                 except IndexError: pass
-            
+
             if temp is None and b'"temperature":"' in buffer:
                 try: temp = buffer.split(b'"temperature":"')[1].split(b'"')[0]
                 except IndexError: pass
-            
-            if weather_code and temp: break 
-            if len(buffer) > 128: buffer = buffer[-64:] 
-                
-        return weather_code.decode() if weather_code else None, temp.decode() if temp else None
+
+            if text is None and b'"text":"' in buffer:
+                try: text = buffer.split(b'"text":"')[1].split(b'"')[0]
+                except IndexError: pass
+
+            if weather_code and temp and text: break
+            if len(buffer) > 128: buffer = buffer[-64:]
+
+        return (weather_code.decode() if weather_code else None,
+                temp.decode() if temp else None,
+                text.decode() if text else None)
     except Exception:
-        return None, None
+        return None, None, None
     finally:
         s.close()
         gc.collect()
