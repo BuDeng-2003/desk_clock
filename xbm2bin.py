@@ -6,9 +6,7 @@ def xbm_to_rgb565_bin(xbm_path, bin_path, fg_color=0xFFFF, bg_color=0x0000):
     with open(xbm_path, 'r') as f:
         content = f.read()
 
-    # 提取十六进制字节
     hex_vals = re.findall(r'0x[0-9a-fA-F]{2}', content)
-    # 32x32单色位图严格等于128字节 (32*32/8)
     if len(hex_vals) != 128:
         print(f"跳过 {xbm_path}：分辨率非 32x32，字节数 {len(hex_vals)} 异常。")
         return
@@ -17,16 +15,13 @@ def xbm_to_rgb565_bin(xbm_path, bin_path, fg_color=0xFFFF, bg_color=0x0000):
     with open(bin_path, 'wb') as out_f:
         for hex_str in hex_vals:
             byte_val = int(hex_str, 16)
-            # XBM 格式规范：低位在前 (LSB first)
             for i in range(8):
                 bit = (byte_val >> i) & 1
                 color = fg_color if bit else bg_color
-                # 写入大端序 RGB565 (>H)
                 out_f.write(struct.pack('>H', color))
 
 # ================= 映射与执行区 =================
 # 心知天气全量代码映射 (0-38)
-# 昼/夜共用有限素材，按语义最接近原则 fallback
 icon_map = {
     # 晴 / 晴间多云
     "0": "sun.xbm",
@@ -79,17 +74,20 @@ icon_map = {
     "38": "wind.xbm",
 }
 
-TARGET_DIR = "wether_UI"
+SRC_DIR = "wether_UI"
+OUT_DIR = "esp32_image"
 
-if not os.path.exists(TARGET_DIR):
-    print(f"致命错误: 当前路径下找不到文件夹 '{TARGET_DIR}'。请检查拼写是否遗漏了字母 a，或检查运行路径！")
+if not os.path.exists(SRC_DIR):
+    print(f"致命错误: 找不到素材文件夹 '{SRC_DIR}'")
+elif not os.path.exists(OUT_DIR):
+    print(f"致命错误: 找不到输出文件夹 '{OUT_DIR}'")
 else:
     for code, xbm_name in icon_map.items():
-        xbm_file = os.path.join(TARGET_DIR, xbm_name)
+        xbm_file = os.path.join(SRC_DIR, xbm_name)
+        out_file = os.path.join(OUT_DIR, f"{code}.bin")
         if os.path.exists(xbm_file):
-            # 渲染设置：前景色橙黄 (0xFD20)，背景色纯黑 (0x0000) 以融入全局底色
-            xbm_to_rgb565_bin(xbm_file, f"{code}.bin", fg_color=0xFD20, bg_color=0x0000)
+            xbm_to_rgb565_bin(xbm_file, out_file, fg_color=0xFD20, bg_color=0x0000)
         else:
             print(f"缺失素材: 找不到 {xbm_file}")
 
-    print("转换结束。请将生成的 .bin 文件全部推流至 ESP32-C3 根目录。")
+    print(f"转换结束。{len(icon_map)} 个 .bin 文件已生成到 {OUT_DIR}/")
