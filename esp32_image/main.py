@@ -64,7 +64,7 @@ tft.rect(CARD_X, CARD_Y, CARD_W, CARD_H, C_ACCENT)
 tft.rect(CARD_X + 2, CARD_Y + 2, CARD_W - 4, CARD_H - 4, C_LINE)
 
 # 中部分割线
-tft.line(40, 140, 200, 140, C_LINE)
+tft.line(40, 137, 200, 137, C_LINE)
 
 # 底部 accent 线
 tft.fill_rect(0, 237, 240, 3, C_ACCENT)
@@ -92,7 +92,7 @@ tft.line(90, 42, 150, 42, C_ACCENT)
 tft.fill_rect(CARD_X, CARD_Y, CARD_W, CARD_H, C_CARD)
 tft.rect(CARD_X, CARD_Y, CARD_W, CARD_H, C_ACCENT)
 tft.rect(CARD_X + 2, CARD_Y + 2, CARD_W - 4, CARD_H - 4, C_LINE)
-tft.line(40, 140, 200, 140, C_LINE)
+tft.line(40, 137, 200, 137, C_LINE)
 tft.fill_rect(0, 237, 240, 3, C_ACCENT)
 
 # ================= 7. 主循环 =================
@@ -121,12 +121,10 @@ while True:
             date_w = len(date_str) * 8
             tft.text(font_small, date_str, (240 - date_w) // 2, 20, C_DATE, C_BG)
 
-        # 时间（每秒重绘）
+        # 时间（每秒重绘，text 自带背景覆写无需先擦除）
         time_str = f"{t[3]:02d}:{t[4]:02d}:{t[5]:02d}"
         time_w = len(time_str) * 16
         time_x = (240 - time_w) // 2
-        # 仅擦除时间文字区域（卡片背景色）
-        tft.fill_rect(CARD_X + 6, CARD_Y + 20, CARD_W - 12, 38, C_CARD)
         tft.text(font_big, time_str, time_x, CARD_Y + 23, C_TIME, C_CARD)
 
     # [协程 2]: 30Min 天气更新
@@ -138,11 +136,20 @@ while True:
         if code and temp:
             # 擦除天气区域
             tft.fill_rect(0, 145, 240, 90, C_BG)
-            tft.line(40, 140, 200, 140, C_LINE)
-            tft.fill_rect(0, 237, 240, 3, C_ACCENT)
 
-            # 天气图标 (32x32)，温度 (big font)，描述 (small font)
-            icon_x, icon_y = 55, 172
+            # 左列：图标 (y=148)，描述在其下方 (y=184)
+            icon_y = 148
+            # 右列：温度 (y=158)，居中对齐左列整体 (图标顶148→描述底199, 中心174)
+            temp_y = 158
+
+            temp_str = str(temp)
+            # 计算图标+温度整行宽度，居中排列
+            temp_group_w = len(temp_str) * 16 + 4 + 6 + 16  # 数字 + 间距 + o + C
+            row_w = ICON_SIZE + 16 + temp_group_w           # 图标 + 间距 + 温度组
+            row_x = (240 - row_w) // 2
+            icon_x = row_x
+            temp_x = row_x + ICON_SIZE + 16
+
             try:
                 with open(f"{code}.bin", "rb") as f:
                     f.readinto(icon_buf)
@@ -150,20 +157,16 @@ while True:
             except OSError:
                 tft.text(font_small, "[X]", icon_x, icon_y + 8, gc9a01.color565(255, 0, 0), C_BG)
 
-            # 温度数字（大号）
-            temp_str = str(temp)
-            temp_w = (len(temp_str) + 1) * 16  # +1 for "C"
-            temp_x = icon_x + ICON_SIZE + 16
-            temp_y = icon_y + 4
-            tft.text(font_big, temp_str, temp_x, temp_y, C_TEMP, C_BG)
-            # °C 用小字体补充（紧贴大号数字右侧）
-            deg_x = temp_x + len(temp_str) * 16
-            tft.text(font_small, "o C", deg_x, temp_y + 6, C_TEMP, C_BG)
-
-            # 天气描述文字（居中）
+            # 描述：居中于图标下方
             if text:
-                desc = text[0].upper() + text[1:]  # 首字母大写
+                desc = text[0].upper() + text[1:]
                 desc_w = len(desc) * 8
-                tft.text(font_small, desc, (240 - desc_w) // 2, 210, C_DESC, C_BG)
+                tft.text(font_small, desc, icon_x + (ICON_SIZE - desc_w) // 2, 184, C_DESC, C_BG)
+
+            # 温度数字
+            tft.text(font_big, temp_str, temp_x, temp_y, C_TEMP, C_BG)
+            deg_x = temp_x + len(temp_str) * 16 + 4
+            tft.text(font_small, "o", deg_x, temp_y - 4, C_TEMP, C_BG)
+            tft.text(font_big, "C", deg_x + 6, temp_y, C_TEMP, C_BG)
 
     time.sleep_ms(50)
