@@ -74,8 +74,8 @@ icon_map = {
     "38": "wind.xbm",
 }
 
-SRC_DIR = "wether_UI"
-OUT_DIR = "esp32_image"
+SRC_DIR = "assets/weather_icons"
+OUT_DIR = "esp32_image/icons"
 
 if not os.path.exists(SRC_DIR):
     print(f"致命错误: 找不到素材文件夹 '{SRC_DIR}'")

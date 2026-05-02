@@ -3,8 +3,8 @@ import time
 import gc
 gc.threshold(16384)
 import gc9a01
-import vga2_16x32 as font_big
-import vga1_8x16 as font_small
+from fonts import vga2_16x32 as font_big
+from fonts import vga1_8x16 as font_small
 from common import net_weather
 
 # ================= 1. 环境配置 =================
@@ -151,7 +151,7 @@ while True:
             temp_x = row_x + ICON_SIZE + 16
 
             try:
-                with open(f"{code}.bin", "rb") as f:
+                with open(f"icons/{code}.bin", "rb") as f:
                     f.readinto(icon_buf)
                 tft.blit_buffer(icon_buf, icon_x, icon_y, ICON_SIZE, ICON_SIZE)
             except OSError:
