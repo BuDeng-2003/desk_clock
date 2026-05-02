@@ -1,3 +1,0 @@
-your-seniverse-api-key==>your-seniverse-api-key
-your-portal-user-id==>your-portal-user-id
-your-portal-password-enc==>your-portal-password-enc

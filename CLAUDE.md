@@ -7,7 +7,7 @@ ESP32-C3 supermini + MicroPython 桌面时钟，GC9A01 240x240 TFT LCD 显示时
 ## 常用命令
 
 ```bash
-# 构建天气图标（assets/weather_icons/*.xbm → esp32_image/icons/*.bin）
+# 构建天气图标（assets/weather_icons/*.xbm → src/icons/*.bin）
 python tools/xbm2bin.py
 
 # 推送全部文件到 ESP32
@@ -37,7 +37,7 @@ SPI: `SPI(1)`, 40MHz. 设备: COM8, vid:303a pid:1001.
 ## 文件结构
 
 ```
-esp32_image/             # 设备文件系统镜像（推流 = 此目录 → ESP32 根目录）
+src/             # 设备文件系统镜像（推流 = 此目录 → ESP32 根目录）
   main.py                #   主程序：硬件初始化、主循环、WDT
   common/
     net_weather.py       #   网络：WiFi + Portal认证 + 心知天气API
@@ -50,7 +50,7 @@ assets/
   weather_icons/         # 图标 XBM 源文件 (22个)
     *.xbm
 tools/
-  xbm2bin.py             # 构建: assets/weather_icons/*.xbm → esp32_image/icons/*.bin
+  xbm2bin.py             # 构建: assets/weather_icons/*.xbm → src/icons/*.bin
 firmware/
   firmware_4MiB.bin      # MicroPython 固件 (含 gc9a01 驱动)
 test/                    # 调试脚本

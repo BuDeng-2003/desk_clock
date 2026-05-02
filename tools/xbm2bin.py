@@ -75,7 +75,7 @@ icon_map = {
 }
 
 SRC_DIR = "assets/weather_icons"
-OUT_DIR = "esp32_image/icons"
+OUT_DIR = "src/icons"
 
 if not os.path.exists(SRC_DIR):
     print(f"致命错误: 找不到素材文件夹 '{SRC_DIR}'")
