@@ -55,8 +55,8 @@ def fetch_weather(api_key, city="beijing"):
 # ========== 独立测试入口 ==========
 if __name__ == "__main__":
     # 假设你的 boot.py 已经连上了 Wi-Fi
-    API_KEY = "your-seniverse-api-key" 
-    
+    API_KEY = "your-seniverse-api-key"
+
     print("--- 内存压力测试 ---")
     print("RAM Before:", gc.mem_free())
     

@@ -5,7 +5,7 @@ import gc
 import socket
 
 # ==================== 校园网黑客探针 ====================
-def login_portal():
+def login_portal(user_id, pass_enc):
     print("[NET] 1. 触发探针，动态获取 ESP32 专属加密特征...")
     s = socket.socket()
     s.settimeout(5.0)
@@ -44,11 +44,7 @@ def login_portal():
     PORTAL_PORT = 8080
     PORTAL_PATH = "/eportal/InterFace.do?method=login"
     
-    # ⚠️ 确保 userId 和 password 仍是你抓包时的内容
-    USER_ID = "your-portal-user-id"
-    PASS_ENC = "your-portal-password-enc"
-    
-    PAYLOAD = f"userId={USER_ID}&password={PASS_ENC}&service=Internet&queryString={encoded_query}&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=true"
+    PAYLOAD = f"userId={user_id}&password={pass_enc}&service=Internet&queryString={encoded_query}&operatorPwd=&operatorUserId=&validcode=&passwordEncrypt=true"
     
     s2 = socket.socket()
     s2.settimeout(5.0)
@@ -71,7 +67,7 @@ def login_portal():
     finally:
         s2.close()
         gc.collect()
-def setup_network(ssid, password=""): 
+def setup_network(ssid, password="", portal_user="", portal_pass=""):
     gc.collect()
     wlan = network.WLAN(network.STA_IF)
     wlan.active(False)
@@ -101,7 +97,7 @@ def setup_network(ssid, password=""):
         print("[NET] 侦测到 MAC 无感知放行，跳过 Portal 注入！")
     except Exception:
         print("[NET] 外网阻断，执行 Portal 动态注入...")
-        login_portal()
+        login_portal(portal_user, portal_pass)
         try:
             ntptime.settime()
             print("[NET] 注入完毕，NTP 同步成功！")

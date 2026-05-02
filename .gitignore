@@ -4,3 +4,4 @@ __pycache__/
 tmp.bat
 .DS_Store
 Thumbs.db
+esp32_image/config.py

@@ -7,11 +7,9 @@ from fonts import vga2_16x32 as font_big
 from fonts import vga1_8x16 as font_small
 from common import net_weather
 
+import config
+
 # ================= 1. 环境配置 =================
-WIFI_SSID = "WHU-STU"
-WIFI_PASS = ""
-API_KEY = "your-seniverse-api-key"
-CITY = "wuhan"
 
 # ================= 2. 配色方案 =================
 C_BG = gc9a01.BLACK
@@ -76,7 +74,7 @@ WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 tft.text(font_small, "WIFI & PORTAL...", 40, 110, C_ACCENT, C_BG)
 
 try:
-    net_weather.setup_network(WIFI_SSID, WIFI_PASS)
+    net_weather.setup_network(config.WIFI_SSID, config.WIFI_PASS, config.PORTAL_USER_ID, config.PORTAL_PASS_ENC)
 except Exception as e:
     tft.text(font_small, "NET ERROR, REBOOT", 40, 110, gc9a01.color565(255, 0, 0), C_BG)
     print("网络错误:", e)
@@ -131,7 +129,7 @@ while True:
     if time.ticks_diff(current_ms, last_weather_update) >= 1800000:
         last_weather_update = current_ms
 
-        code, temp, text = net_weather.fetch_weather(API_KEY, CITY)
+        code, temp, text = net_weather.fetch_weather(config.API_KEY, config.CITY)
 
         if code and temp:
             # 擦除天气区域
